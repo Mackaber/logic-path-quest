@@ -21,7 +21,7 @@ const Index = () => {
 
   // Generate maze
   const { maze, start, end } = generateMaze(15, 15, seed);
-  const availableBlocks: Direction[] = ['up', 'down', 'left', 'right', 'up', 'down', 'left', 'right'];
+  const availableBlocks: Direction[] = ['up', 'down', 'left', 'right'];
 
   // Initialize character position
   useEffect(() => {
@@ -59,7 +59,7 @@ const Index = () => {
       setCurrentStep(i);
       
       // Wait for animation
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 600));
 
       const direction = program[i];
       
@@ -67,7 +67,7 @@ const Index = () => {
         setGameState('error');
         toast({
           title: "Error!",
-          description: `Can't move ${direction} from current position. Program stopped.`,
+          description: `Can't move ${direction} from current position. Program stopped at step ${i + 1}.`,
           variant: "destructive",
         });
         return;
@@ -82,7 +82,7 @@ const Index = () => {
       if (currentPos.x === end.x && currentPos.y === end.y) {
         setGameState('success');
         toast({
-          title: "Success!",
+          title: "Success! 🎉",
           description: "You've reached the fruit! Well done!",
           variant: "default",
         });
@@ -91,7 +91,7 @@ const Index = () => {
     }
 
     // Program finished but didn't reach the fruit
-    setGameState('error');
+    setGameState('idle');
     toast({
       title: "Program Complete",
       description: "Program finished, but you didn't reach the fruit. Try adding more steps!",
