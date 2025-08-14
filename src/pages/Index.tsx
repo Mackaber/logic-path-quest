@@ -117,6 +117,16 @@ const Index = () => {
     setProgram(prev => prev.filter((_, i) => i !== index));
   };
 
+  const reorderProgram = (fromIndex: number, toIndex: number) => {
+    if (gameState === 'running') return;
+    setProgram(prev => {
+      const newProgram = [...prev];
+      const [movedBlock] = newProgram.splice(fromIndex, 1);
+      newProgram.splice(toIndex, 0, movedBlock);
+      return newProgram;
+    });
+  };
+
   const getStatusColor = () => {
     switch (gameState) {
       case 'success': return 'text-secondary';
@@ -192,6 +202,7 @@ const Index = () => {
             onReset={resetExecution}
             onClear={clearProgram}
             onBlockClick={removeFromProgram}
+            onReorderProgram={reorderProgram}
           />
         </div>
 

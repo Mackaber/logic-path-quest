@@ -15,6 +15,7 @@ interface ProgrammingInterfaceProps {
   onReset: () => void;
   onClear: () => void;
   onBlockClick: (index: number) => void;
+  onReorderProgram: (fromIndex: number, toIndex: number) => void;
   className?: string;
 }
 
@@ -28,8 +29,11 @@ export default function ProgrammingInterface({
   onReset,
   onClear,
   onBlockClick,
+  onReorderProgram,
   className
 }: ProgrammingInterfaceProps) {
+  const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null);
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
@@ -37,9 +41,35 @@ export default function ProgrammingInterface({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const direction = e.dataTransfer.getData('direction') as Direction;
-    if (direction) {
+    const fromIndex = e.dataTransfer.getData('fromIndex');
+    
+    if (direction && !fromIndex) {
+      // Dropping a new block from available blocks
       onDrop(direction);
     }
+  };
+
+  const handleProgramBlockDragStart = (e: React.DragEvent, index: number, direction: Direction) => {
+    e.dataTransfer.setData('fromIndex', index.toString());
+    e.dataTransfer.setData('direction', direction);
+    setDraggedIndex(index);
+  };
+
+  const handleProgramBlockDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    const fromIndexStr = e.dataTransfer.getData('fromIndex');
+    
+    if (fromIndexStr) {
+      const fromIndex = parseInt(fromIndexStr);
+      if (fromIndex !== dropIndex) {
+        onReorderProgram(fromIndex, dropIndex);
+      }
+    }
+    setDraggedIndex(null);
+  };
+
+  const handleProgramBlockDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
   };
 
   return (
@@ -114,18 +144,27 @@ export default function ProgrammingInterface({
                   key={index}
                   className={cn(
                     'relative',
-                    currentStep === index && isExecuting && 'ring-4 ring-accent ring-opacity-75 rounded-lg'
+                    currentStep === index && isExecuting && 'ring-4 ring-accent ring-opacity-75 rounded-lg',
+                    draggedIndex === index && 'opacity-50'
                   )}
+                  onDrop={(e) => handleProgramBlockDrop(e, index)}
+                  onDragOver={handleProgramBlockDragOver}
                 >
-                  <DirectionBlock
-                    direction={direction}
-                    onClick={() => onBlockClick(index)}
-                    className={cn(
-                      'cursor-pointer',
-                      currentStep === index && isExecuting && 'animate-pulse',
-                      index < currentStep && isExecuting && 'opacity-50'
-                    )}
-                  />
+                  <div
+                    draggable={!isExecuting}
+                    onDragStart={(e) => handleProgramBlockDragStart(e, index, direction)}
+                  >
+                    <DirectionBlock
+                      direction={direction}
+                      onClick={() => onBlockClick(index)}
+                      className={cn(
+                        'cursor-pointer',
+                        currentStep === index && isExecuting && 'animate-pulse',
+                        index < currentStep && isExecuting && 'opacity-50',
+                        !isExecuting && 'hover:scale-105'
+                      )}
+                    />
+                  </div>
                   <span className="absolute -top-2 -left-2 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
                     {index + 1}
                   </span>
