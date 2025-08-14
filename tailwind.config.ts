@@ -61,7 +61,24 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				maze: {
+					wall: 'hsl(var(--maze-wall))',
+					path: 'hsl(var(--maze-path))',
+					character: 'hsl(var(--maze-character))',
+					fruit: 'hsl(var(--maze-fruit))'
+				},
+				block: {
+					up: 'hsl(var(--block-up))',
+					down: 'hsl(var(--block-down))',
+					left: 'hsl(var(--block-left))',
+					right: 'hsl(var(--block-right))'
 				}
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-success': 'var(--gradient-success)',
+				'gradient-game': 'var(--gradient-game)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
