@@ -63,8 +63,8 @@ export default function MazeDisplay({
         <div
           className="absolute w-4 h-4 bg-maze-character rounded-full shadow-lg transition-all duration-500 ease-in-out transform"
           style={{
-            left: `${characterPosition.x * 24 + 20}px`, // 24px = cell size (w-6 = 24px) + 20px for padding
-            top: `${characterPosition.y * 24 + 20}px`,
+            left: `${characterPosition.x * 24 + 20 - 14}px`, // 24px = cell size (w-6 = 24px) + 20px for padding
+            top: `${characterPosition.y * 24 + 20 - 14}px`,
             zIndex: 10
           }}
         />
