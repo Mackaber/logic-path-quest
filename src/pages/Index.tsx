@@ -18,16 +18,19 @@ const Index = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [characterPosition, setCharacterPosition] = useState<Position>({ x: 1, y: 1 });
   const [executionPath, setExecutionPath] = useState<Position[]>([]);
+  const [mazeData, setMazeData] = useState(() => generateMaze(15, 15, seed));
 
-  // Generate maze
-  const { maze, start, end } = generateMaze(15, 15, seed);
-  const availableBlocks: Direction[] = ['up', 'down', 'left', 'right'];
-
-  // Initialize character position
+  // Generate maze when seed changes
   useEffect(() => {
-    setCharacterPosition(start);
-    setExecutionPath([start]);
-  }, [seed, start]);
+    const newMazeData = generateMaze(15, 15, seed);
+    setMazeData(newMazeData);
+    setCharacterPosition(newMazeData.start);
+    setExecutionPath([newMazeData.start]);
+  }, [seed]);
+
+  const { maze, start, end } = mazeData;
+
+  const availableBlocks: Direction[] = ['up', 'down', 'left', 'right'];
 
   const generateNewMaze = () => {
     if (gameState === 'running') return;

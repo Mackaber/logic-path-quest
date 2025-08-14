@@ -58,17 +58,22 @@ export function generateMaze(width: number, height: number, seed: string): {
 
   // Recursive backtracking algorithm
   function carvePassage(x: number, y: number) {
+    if (x < 0 || x >= width || y < 0 || y >= height) return;
+    
     maze[y][x].isWall = false;
     maze[y][x].visited = true;
 
     // Get random directions
     const directions: Direction[] = ['up', 'down', 'left', 'right'];
+    // Fisher-Yates shuffle
     for (let i = directions.length - 1; i > 0; i--) {
       const j = Math.floor(random() * (i + 1));
       [directions[i], directions[j]] = [directions[j], directions[i]];
     }
 
     for (const direction of directions) {
+      if (!direction || !DIRECTIONS[direction]) continue; // Safety check
+      
       const dx = DIRECTIONS[direction].x * 2;
       const dy = DIRECTIONS[direction].y * 2;
       const nx = x + dx;
@@ -76,7 +81,11 @@ export function generateMaze(width: number, height: number, seed: string): {
 
       if (nx >= 0 && nx < width && ny >= 0 && ny < height && !maze[ny][nx].visited) {
         // Carve the wall between current cell and next cell
-        maze[y + DIRECTIONS[direction].y][x + DIRECTIONS[direction].x].isWall = false;
+        const wallX = x + DIRECTIONS[direction].x;
+        const wallY = y + DIRECTIONS[direction].y;
+        if (wallX >= 0 && wallX < width && wallY >= 0 && wallY < height) {
+          maze[wallY][wallX].isWall = false;
+        }
         carvePassage(nx, ny);
       }
     }
