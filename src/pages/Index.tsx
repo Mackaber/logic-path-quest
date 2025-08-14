@@ -18,11 +18,11 @@ const Index = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [characterPosition, setCharacterPosition] = useState<Position>({ x: 1, y: 1 });
   const [executionPath, setExecutionPath] = useState<Position[]>([]);
-  const [mazeData, setMazeData] = useState(() => generateMaze(15, 15, seed));
+  const [mazeData, setMazeData] = useState(() => generateMaze(9, 9, seed));
 
   // Generate maze when seed changes
   useEffect(() => {
-    const newMazeData = generateMaze(15, 15, seed);
+    const newMazeData = generateMaze(9, 9, seed);
     setMazeData(newMazeData);
     setCharacterPosition(newMazeData.start);
     setExecutionPath([newMazeData.start]);
