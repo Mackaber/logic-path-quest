@@ -33,6 +33,8 @@ export default function ProgrammingInterface({
   className
 }: ProgrammingInterfaceProps) {
   const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -82,6 +84,11 @@ export default function ProgrammingInterface({
             <DirectionBlock
               key={`${direction}-${index}`}
               direction={direction}
+              // Mobile: tap to add
+              onClick={() => {
+                if (isMobile && !isExecuting) onDrop(direction);
+              }}
+              // Desktop: drag only
             />
           ))}
         </div>
@@ -121,7 +128,7 @@ export default function ProgrammingInterface({
             </Button>
           </div>
         </div>
-        
+
         <div
           className={cn(
             'min-h-20 border-2 border-dashed border-muted-foreground/30 rounded-lg p-4',
@@ -134,7 +141,7 @@ export default function ProgrammingInterface({
           {program.length === 0 ? (
             <div className="flex items-center justify-center h-16">
               <p className="text-muted-foreground text-sm">
-                Drag direction blocks here to create your program
+                {isMobile ? 'Tap direction blocks above to add to your program' : 'Drag direction blocks here to create your program'}
               </p>
             </div>
           ) : (
@@ -145,18 +152,30 @@ export default function ProgrammingInterface({
                   className={cn(
                     'relative',
                     currentStep === index && isExecuting && 'ring-4 ring-accent ring-opacity-75 rounded-lg',
-                    draggedIndex === index && 'opacity-50'
+                    draggedIndex === index && 'opacity-50',
+                    selectedIndex === index && 'ring-2 ring-primary'
                   )}
                   onDrop={(e) => handleProgramBlockDrop(e, index)}
                   onDragOver={handleProgramBlockDragOver}
                 >
                   <div
-                    draggable={!isExecuting}
+                    draggable={!isExecuting && !isMobile}
                     onDragStart={(e) => handleProgramBlockDragStart(e, index, direction)}
                   >
                     <DirectionBlock
                       direction={direction}
-                      onClick={() => onBlockClick(index)}
+                      onClick={() => {
+                        if (isMobile && !isExecuting) {
+                          if (selectedIndex === index) {
+                            onBlockClick(index); // remove if tapped again
+                            setSelectedIndex(null);
+                          } else {
+                            setSelectedIndex(index);
+                          }
+                        } else if (!isMobile) {
+                          onBlockClick(index);
+                        }
+                      }}
                       className={cn(
                         'cursor-pointer',
                         currentStep === index && isExecuting && 'animate-pulse',
@@ -168,6 +187,17 @@ export default function ProgrammingInterface({
                   <span className="absolute -top-2 -left-2 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
                     {index + 1}
                   </span>
+                  {/* Mobile: show reorder arrows if selected */}
+                  {isMobile && selectedIndex === index && !isExecuting && (
+                    <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 flex gap-1">
+                      <Button size="icon" variant="outline" disabled={index === 0} onClick={() => onReorderProgram(index, index - 1)}>
+                        ↑
+                      </Button>
+                      <Button size="icon" variant="outline" disabled={index === program.length - 1} onClick={() => onReorderProgram(index, index + 1)}>
+                        ↓
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
